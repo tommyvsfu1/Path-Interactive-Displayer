@@ -39,7 +39,7 @@ Bspline = 1/6 * np.array([[-1, 3, -3, 1],
 
 
 P = np.array([[1, 4], [2, 9], [5, 9], [6, 4]], dtype=float)
-TList = [np.array([t**3, t**2, t, 1], dtype=float) for t in np.arange(0.0, 1.01, 0.01)]
+TList = [np.array([t**3, t**2, t, 1], dtype=float) for t in np.arange(0.0, 1.01, 0.01)] # sampling
 
 
 class MainWindow(ui.Ui_MainWindow):
@@ -125,7 +125,9 @@ class MainWindow(ui.Ui_MainWindow):
         # verticalLayout_13 就是顯示畫面的widget
         self.verticalLayout_13.addWidget(self.ntb)
         self.verticalLayout_13.addWidget(self.canvas)
-        self.ax = self.figure.add_subplot(111, facecolor='#FFFFFF', )
+        self.ax = self.figure.add_subplot(2,1,1, facecolor='#FFFFFF', )
+        self.ax_curvature = self.figure.add_subplot(2,1,2, facecolor='#FFFFFF', )
+        self.ax_curvature.get_shared_x_axes().join(self.ax, self.ax_curvature)
 
         poly = Polygon(P, animated=True, closed=False)
         self.poly = poly
@@ -218,10 +220,16 @@ class MainWindow(ui.Ui_MainWindow):
     def draw_curves(self):
         '绘制当前可交互图形'
         self.update_points()
-        previousx = plt.xlim()
-        previousy = plt.ylim()
 
-        plt.cla()
+        # change to ax setting(equal to plt.xlim)
+        #previousx = plt.xlim()
+        #previousy = plt.ylim()
+        previousx = self.ax.get_xlim()
+        previousy = self.ax.get_ylim()
+        #plt.cla()
+        self.ax.clear() # clear previous ax before drawing new ax
+        #########################################
+
         if self.figure_list:
             for p in self.figure_list:
                 self.draw_previous_figure(p)
@@ -231,10 +239,10 @@ class MainWindow(ui.Ui_MainWindow):
         mark = self.lineEdit.text()
 
         if self.checkBox_2.isChecked(): # checkBox_2 is whether to draw control point
-            plt.plot(P[0, 0], P[0, 1], 'bo', markersize=7)
-            plt.plot(P[1, 0], P[1, 1], 'ro', markersize=7)
-            plt.plot(P[2, 0], P[2, 1], 'go', markersize=7)
-            plt.plot(P[3, 0], P[3, 1], 'yo', markersize=7)
+            self.ax.plot(P[0, 0], P[0, 1], 'bo', markersize=7)
+            self.ax.plot(P[1, 0], P[1, 1], 'ro', markersize=7)
+            self.ax.plot(P[2, 0], P[2, 1], 'go', markersize=7)
+            self.ax.plot(P[3, 0], P[3, 1], 'yo', markersize=7)
 
 
         ######Path Algorithm#######################################
@@ -244,44 +252,54 @@ class MainWindow(ui.Ui_MainWindow):
                 xt.append(T.dot(B).dot(P[:, 0]))
                 yt.append(T.dot(B).dot(P[:, 1]))
             try:
-                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, mark, linewidth=lw, markersize=ms)
             except Exception as e:
-                plt.plot(xt, yt, '-', linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, '-', linewidth=lw, markersize=ms)
 
             if self.checkBox.isChecked():
-                plt.plot(P[:2, 0], P[:2, 1], 'b--', linewidth=1)
-                plt.plot(P[2:, 0], P[2:, 1], 'r--', linewidth=1)
+                self.ax.plot(P[:2, 0], P[:2, 1], 'b--', linewidth=1)
+                self.ax.plot(P[2:, 0], P[2:, 1], 'r--', linewidth=1)
         elif self.radioButton_2.isChecked():
             xt, yt = [], []
             for T in TList:
                 xt.append(T.dot(Bspline).dot(P[:, 0]))
                 yt.append(T.dot(Bspline).dot(P[:, 1]))
             try:
-                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, mark, linewidth=lw, markersize=ms)
             except Exception as e:
-                plt.plot(xt, yt, '-', linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, '-', linewidth=lw, markersize=ms)
             if self.checkBox.isChecked():
-                plt.plot(P[:2, 0], P[:2, 1], 'b--', linewidth=1)
-                plt.plot(P[2:, 0], P[2:, 1], 'r--', linewidth=1)
-                plt.plot(P[1:3, 0], P[1:3, 1], 'y--', linewidth=1)
+                self.ax.plot(P[:2, 0], P[:2, 1], 'b--', linewidth=1)
+                self.ax.plot(P[2:, 0], P[2:, 1], 'r--', linewidth=1)
+                self.ax.plot(P[1:3, 0], P[1:3, 1], 'y--', linewidth=1)
         elif self.radioButton_linear.isChecked():
             xt, yt = [], []
-            for ii in range(P.shape[0]):
-                xt.append(P[ii,0])
-                yt.append(P[ii,1])
-                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms)           
+            for control_point_index in range(P.shape[0]):
+                xt.append(P[control_point_index,0])
+                yt.append(P[control_point_index,1])
+                self.ax.plot(xt, yt, mark, linewidth=lw, markersize=ms)           
         ############################################################
 
         if self.checkBox_3.isChecked(): # checkbox3 is whether to draw grid
             self.ax.grid(linestyle='-', linewidth=0.5)
-        plt.axis('equal')
-        self.ax.set_aspect(1)
+        
+        #plt.axis('equal')
+        self.ax.set_aspect('auto')
+        self.ax_curvature.set_aspect('auto')
         if self.flag:
-            plt.xlim(previousx)
-            plt.ylim(previousy)
+            # change to ax setting(equal to plt.xlim)
+            #plt.xlim(previousx)
+            #plt.ylim(previousy)
+            self.ax.set_xlim(previousx)
+            self.ax.set_ylim(previousy)
+            #########################################
+
         self.flag = True
         self.canvas.draw()
 
+    def draw_curvature_2d(self):
+        '繪製曲率圖形'
+        pass
 
     def draw_previous_figure(self, s):
         '绘制已经fix的图形'
@@ -291,10 +309,10 @@ class MainWindow(ui.Ui_MainWindow):
         curves = s[4]
         s = s[0]
         if self.checkBox_2.isChecked():
-            plt.plot(s[0, 0], s[0, 1], 'ko', markersize=7)
-            plt.plot(s[1, 0], s[1, 1], 'ko', markersize=7)
-            plt.plot(s[2, 0], s[2, 1], 'ko', markersize=7)
-            plt.plot(s[3, 0], s[3, 1], 'ko', markersize=7)
+            self.ax.plot(s[0, 0], s[0, 1], 'ko', markersize=7)
+            self.ax.plot(s[1, 0], s[1, 1], 'ko', markersize=7)
+            self.ax.plot(s[2, 0], s[2, 1], 'ko', markersize=7)
+            self.ax.plot(s[3, 0], s[3, 1], 'ko', markersize=7)
 
         if self.radioButton.isChecked():
             xt, yt = [], []
@@ -302,32 +320,32 @@ class MainWindow(ui.Ui_MainWindow):
                 xt.append(T.dot(B).dot(s[:, 0]))
                 yt.append(T.dot(B).dot(s[:, 1]))
             try:
-                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, mark, linewidth=lw, markersize=ms)
             except Exception as e:
-                plt.plot(xt, yt, '-', linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, '-', linewidth=lw, markersize=ms)
 
             if self.checkBox.isChecked():
-                plt.plot(s[:2, 0], s[:2, 1], 'k--', linewidth=1)
-                plt.plot(s[2:, 0], s[2:, 1], 'k--', linewidth=1)
+                self.ax.plot(s[:2, 0], s[:2, 1], 'k--', linewidth=1)
+                self.ax.plot(s[2:, 0], s[2:, 1], 'k--', linewidth=1)
         elif self.radioButton_2.isChecked():
             xt, yt = [], []
             for T in TList:
                 xt.append(T.dot(Bspline).dot(s[:, 0]))
                 yt.append(T.dot(Bspline).dot(s[:, 1]))
             try:
-                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, mark, linewidth=lw, markersize=ms)
             except Exception as e:
-                plt.plot(xt, yt, '-', linewidth=lw, markersize=ms)
+                self.ax.plot(xt, yt, '-', linewidth=lw, markersize=ms)
             if self.checkBox.isChecked():
-                plt.plot(s[:2, 0], s[:2, 1], 'k--', linewidth=1)
-                plt.plot(s[2:, 0], s[2:, 1], 'k--', linewidth=1)
-                plt.plot(s[1:3, 0], s[1:3, 1], 'k--', linewidth=1)
+                self.ax.plot(s[:2, 0], s[:2, 1], 'k--', linewidth=1)
+                self.ax.plot(s[2:, 0], s[2:, 1], 'k--', linewidth=1)
+                self.ax.plot(s[1:3, 0], s[1:3, 1], 'k--', linewidth=1)
         elif self.radioButton_linear.isChecked():
             xt, yt = [], []
             for ii in range(P.shape[0]):
                 xt.append(P[ii,0])
                 yt.append(P[ii,1])
-                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms) 
+                self.ax.plot(xt, yt, mark, linewidth=lw, markersize=ms) 
 
     def get_ind_under_point(self, event):
         '计算鼠标点是否在某个点的范围内'
