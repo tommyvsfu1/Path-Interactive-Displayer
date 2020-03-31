@@ -105,6 +105,7 @@ class MainWindow(ui.Ui_MainWindow):
         self.doubleSpinBox_8.valueChanged.connect(self.draw_curves)
         self.radioButton.clicked.connect(self.draw_curves)
         self.radioButton_2.clicked.connect(self.draw_curves)
+        self.radioButton_linear.clicked.connect(self.draw_curves)
         self.checkBox.clicked.connect(self.draw_curves)
         self.checkBox_2.clicked.connect(self.draw_curves)
         self.checkBox_3.clicked.connect(self.draw_curves)
@@ -168,6 +169,15 @@ class MainWindow(ui.Ui_MainWindow):
             self.doubleSpinBox_6.setValue(S[3, 1])
             self.doubleSpinBox_7.setValue(S[0, 0])
             self.doubleSpinBox_8.setValue(S[0, 1])
+        elif self.radioButton_linear.isChecked(): # Linear
+            self.doubleSpinBox_1.setValue(S[0, 0])
+            self.doubleSpinBox_2.setValue(S[0, 1])
+            self.doubleSpinBox_3.setValue(S[1, 0])
+            self.doubleSpinBox_4.setValue(S[1, 1])
+            self.doubleSpinBox_5.setValue(S[2, 0])
+            self.doubleSpinBox_6.setValue(S[2, 1])
+            self.doubleSpinBox_7.setValue(S[3, 0])
+            self.doubleSpinBox_8.setValue(S[3, 1])        
 
         self.initial_button()
         self.draw_curves()
@@ -254,6 +264,12 @@ class MainWindow(ui.Ui_MainWindow):
                 plt.plot(P[:2, 0], P[:2, 1], 'b--', linewidth=1)
                 plt.plot(P[2:, 0], P[2:, 1], 'r--', linewidth=1)
                 plt.plot(P[1:3, 0], P[1:3, 1], 'y--', linewidth=1)
+        elif self.radioButton_linear.isChecked():
+            xt, yt = [], []
+            for ii in range(P.shape[0]):
+                xt.append(P[ii,0])
+                yt.append(P[ii,1])
+                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms)           
         ############################################################
 
         if self.checkBox_3.isChecked(): # checkbox3 is whether to draw grid
@@ -280,7 +296,7 @@ class MainWindow(ui.Ui_MainWindow):
             plt.plot(s[2, 0], s[2, 1], 'ko', markersize=7)
             plt.plot(s[3, 0], s[3, 1], 'ko', markersize=7)
 
-        if curves:
+        if self.radioButton.isChecked():
             xt, yt = [], []
             for T in TList:
                 xt.append(T.dot(B).dot(s[:, 0]))
@@ -293,7 +309,7 @@ class MainWindow(ui.Ui_MainWindow):
             if self.checkBox.isChecked():
                 plt.plot(s[:2, 0], s[:2, 1], 'k--', linewidth=1)
                 plt.plot(s[2:, 0], s[2:, 1], 'k--', linewidth=1)
-        else:
+        elif self.radioButton_2.isChecked():
             xt, yt = [], []
             for T in TList:
                 xt.append(T.dot(Bspline).dot(s[:, 0]))
@@ -306,7 +322,12 @@ class MainWindow(ui.Ui_MainWindow):
                 plt.plot(s[:2, 0], s[:2, 1], 'k--', linewidth=1)
                 plt.plot(s[2:, 0], s[2:, 1], 'k--', linewidth=1)
                 plt.plot(s[1:3, 0], s[1:3, 1], 'k--', linewidth=1)
-
+        elif self.radioButton_linear.isChecked():
+            xt, yt = [], []
+            for ii in range(P.shape[0]):
+                xt.append(P[ii,0])
+                yt.append(P[ii,1])
+                plt.plot(xt, yt, mark, linewidth=lw, markersize=ms) 
 
     def get_ind_under_point(self, event):
         '计算鼠标点是否在某个点的范围内'

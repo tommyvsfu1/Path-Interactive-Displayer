@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window.ui'
+# Form implementation generated from reading ui file 'new_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1272, 911)
+        MainWindow.resize(1204, 911)
         font = QtGui.QFont()
         font.setFamily("Microsoft YaHei UI")
         font.setPointSize(10)
@@ -40,12 +42,15 @@ class Ui_MainWindow(object):
         self.radioButton.setCheckable(True)
         self.radioButton.setChecked(True)
         self.radioButton.setAutoRepeat(False)
+        self.radioButton.setAutoRepeatInterval(100)
         self.radioButton.setObjectName("radioButton")
         self.verticalLayout_2.addWidget(self.radioButton)
         self.radioButton_2 = QtWidgets.QRadioButton(self.groupBox_2)
         self.radioButton_2.setObjectName("radioButton_2")
         self.verticalLayout_2.addWidget(self.radioButton_2)
-        self.verticalLayout_2.setStretch(0, 1)
+        self.radioButton_linear = QtWidgets.QRadioButton(self.groupBox_2)
+        self.radioButton_linear.setObjectName("radioButton_linear")
+        self.verticalLayout_2.addWidget(self.radioButton_linear)
         self.verticalLayout_2.setStretch(1, 1)
         self.horizontalLayout.addWidget(self.groupBox_2)
         self.groupBox_8 = QtWidgets.QGroupBox(self.groupBox)
@@ -265,7 +270,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.setStretch(0, 4)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1272, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1204, 21))
         self.menubar.setObjectName("menubar")
         self.menuabout = QtWidgets.QMenu(self.menubar)
         self.menuabout.setObjectName("menuabout")
@@ -281,7 +286,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.horizontalSlider.valueChanged['int'].connect(self.label_10.setNum)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        MainWindow.setTabOrder(self.radioButton, self.radioButton_2)
         MainWindow.setTabOrder(self.radioButton_2, self.doubleSpinBox_2)
         MainWindow.setTabOrder(self.doubleSpinBox_2, self.doubleSpinBox_4)
         MainWindow.setTabOrder(self.doubleSpinBox_4, self.doubleSpinBox_5)
@@ -295,6 +299,7 @@ class Ui_MainWindow(object):
         self.groupBox_2.setTitle(_translate("MainWindow", "Curves"))
         self.radioButton.setText(_translate("MainWindow", "Bezier"))
         self.radioButton_2.setText(_translate("MainWindow", "B-Spline"))
+        self.radioButton_linear.setText(_translate("MainWindow", "Linear"))
         self.groupBox_8.setTitle(_translate("MainWindow", "Operate"))
         self.pushButton.setText(_translate("MainWindow", "Reset"))
         self.pushButton_2.setText(_translate("MainWindow", "Fix"))
@@ -321,3 +326,12 @@ class Ui_MainWindow(object):
         self.menuabout.setTitle(_translate("MainWindow", "about"))
         self.action.setText(_translate("MainWindow", "author information"))
 
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
